@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Morse Code Converter</title>
+
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  </head>
+  <body>
+    <py-config type="json">
+      {
+        "fetch": [{
+          "files": ["./art.py"]
+        }]
+      }
+    </py-config>
+
+    <py-script>
+        from art import logo
+        from js import document
+
+        morse_alpha_dict = {
+            "a": ".-", "b": "-...", "c": "-.-.", "d": "-..", "e": ".", "f": "..-.", "g": "--.", "h": "....", "i": "..",
+            "j": ".---", "k": "-.-", "l": ".-..", "m": "--", "n": "-.", "o": "---", "p": ".--.", "q": "--.-", "r": ".-.",
+            "s": "...", "t": "-", "u": "	..-", "v": "...-", "w": ".--", "x": "-..-", "y": "-.--", "z": "--.."
+        }
+
+        morse_num_dict = {
+            "0": "-----", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...",
+            "8": "---..", "9": "----."
+        }
+
+        morse_sym_dict = {
+            ".": ".-.-.-", ",": "--..--", "?": "..--..", "'": ".----.", "!": "-.-.--", "/": "-..-.", "(": "-.--.",
+            ")": "-.--.-", "&": ".-...", ":": "---...", ";": "-.-.-.", "=": "-...-", "+": ".-.-.", "-": "-....-",
+            "_": "..--.-", '"': ".-..-.", "$": "...-..-", "@": ".--.-.", "¿": "..-.-", "¡": "--...-"
+        }
+
+
+        def reset(div: str, input: str):
+            document.getElementById("label").innerHTML = 'Which action would you like to choose? Type "encode", "decode", or "stop"';
+            document.getElementById(input).value = ""
+            document.getElementById(div).style.display = "none";
+            document.getElementById("input-div").style.display = "block";
+
+
+        def get_encode(msg: str) -> str:
+            encoded_word = ""
+            for letter in msg:
+                if letter in morse_alpha_dict:
+                    encoded_word += f"{morse_alpha_dict[letter]} "
+                elif letter in morse_num_dict:
+                    encoded_word += f"{morse_num_dict[letter]} "
+                elif letter in morse_sym_dict:
+                    encoded_word += f"{morse_sym_dict[letter]} "
+                elif letter == " ":
+                    encoded_word += "* "
+            return encoded_word
+
+
+        def get_decode(msg: list) -> str:
+            inv_alpha_dict = {value: key for key, value in morse_alpha_dict.items()}
+            inv_num_dict = {value: key for key, value in morse_num_dict.items()}
+            inv_sym_dict = {value: key for key, value in morse_sym_dict.items()}
+
+            decoded_word = ""
+            for morse in msg:
+                if morse in inv_alpha_dict:
+                    decoded_word += inv_alpha_dict[morse]
+                elif morse in inv_num_dict:
+                    decoded_word += inv_num_dict[morse]
+                elif morse in inv_sym_dict:
+                    decoded_word += inv_sym_dict[morse]
+                elif morse == "*":
+                    decoded_word += " "
+                else:
+                    decoded_word += ""
+            return decoded_word
+
+
+        def morse_converter():
+            input_div = document.getElementById("input-div")
+            label = document.getElementById("label")
+            type_input = document.getElementById("type-input")
+
+            convert_type = type_input.value
+            convert_type = convert_type.lower()
+
+            input_div.style.display = "none";
+
+            if convert_type == "encode":
+                type_input.value = ""
+                label.innerHTML = "Please type the message you would like to encode";
+                document.getElementById("encode-div").style.display = "block";
+
+            elif convert_type == "decode":
+                type_input.value = ""
+                label.innerHTML = "Please type the morse code separated by spaces and words separated by ' * ' (e.g.: .- -... * -.-):\n";
+                document.getElementById("decode-div").style.display = "block";
+
+            elif convert_type == "stop":
+                label.style.display = "none";
+                print("Thank you for using the morse code converter!")
+
+            else:
+                input_div.style.display = "block";
+
+
+        def encode_msg(*args, **kwargs):
+            msg = document.getElementById("encode-input").value;
+
+            if msg:
+                msg = msg.lower()
+                morse_code = get_encode(str(msg))
+                print(morse_code)
+
+                reset("encode-div", "encode-input")
+
+
+        def decode_msg(*args, **kwargs):
+            msg = document.getElementById("decode-input").value;
+
+            if msg:
+                msg = msg.lower()
+                word = get_decode(msg.split(" "))
+                print(word)
+
+                reset("decode-div", "decode-input")
+
+
+        print(logo)
+        print("Welcome to the morse code converter!")
+    </py-script>
+
+    <label id="label">Which action would you like to choose? Type "encode", "decode", or "stop"</label>
+    <div id="input-div">
+        <input typ="text" id="type-input" />
+        <button type="submit" py-click="morse_converter()">Submit</button>
+    </div>
+
+    <div id="encode-div" style="display: none;">
+        <input typ="text" id="encode-input"/>
+        <button type="submit" py-click="encode_msg()">Encode</button>
+    </div>
+
+    <div id="decode-div" style="display: none;">
+        <input typ="text" id="decode-input" />
+        <button type="submit" py-click="decode_msg()">Decode</button>
+    </div>
+  </body>
+</html>
