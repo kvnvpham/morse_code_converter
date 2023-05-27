@@ -25,7 +25,8 @@ git clone https://github.com/kvnvpham/morse_code_converter.git
 ```
 
 Alternatively, run the script using PyScript by downloading the provided HTML file 
-and starting a local server in the respective directory with the file.
+with art.py and starting a local server in the respective directory with the file.
+
 For example: 
 
 ```bash
